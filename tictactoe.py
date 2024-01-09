@@ -1,196 +1,194 @@
-import pygame as pgsys
-from pygame.locals import *
-import time
-
-#initialize global variables
-XO = 'x'
-winner = None
-draw = False
-width = 400
-height = 400
-white = (255, 255, 255)
-line_color = (10,10,10)
-
-#TicTacToe 3x3 board
-TTT = [[None]*3,[None]*3,[None]*3]
-
-#initializing pygame window
-pg.init()
-fps = 30
-CLOCK = pg.time.Clock()
-screen = pg.display.set_mode((width, height+100),0,32)
-pg.display.set_caption("Tic Tac Toe")
-
-#loading the images
-opening = pg.image.load('tic tac opening.png')
-x_img = pg.image.load('x.png')
-o_img = pg.image.load('o.png')
-
-#resizing images
-x_img = pg.transform.scale(x_img, (80,80))
-o_img = pg.transform.scale(o_img, (80,80))
-opening = pg.transform.scale(opening, (width, height+100))
-
-
-def game_opening():
-    screen.blit(opening,(0,0))
-    pg.display.update()
-    time.sleep(1)
-    screen.fill(white)
-    
-    # Drawing vertical lines
-    pg.draw.line(screen,line_color,(width/3,0),(width/3, height),7)
-    pg.draw.line(screen,line_color,(width/3*2,0),(width/3*2, height),7)
-    # Drawing horizontal lines
-    pg.draw.line(screen,line_color,(0,height/3),(width, height/3),7)
-    pg.draw.line(screen,line_color,(0,height/3*2),(width, height/3*2),7)
-    draw_status()
+def main():
+# The main function
+    introduction = intro()
+    board = create_grid()
+    pretty = printPretty(board)
+    symbol_1, symbol_2 = sym()
+    full = isFull(board, symbol_1, symbol_2) # The function that starts the game is also in here.
     
 
-def draw_status():
-    global draw
+    
 
-    if winner is None:
-        message = XO.upper() + "'s Turn"
+
+def intro():
+# This function introduces the rules of the game Tic Tac Toe
+    print("Hello! Welcome to Pam's Tic Tac Toe game!")
+    print("\n")
+    print("Rules: Player 1 and player 2, represented by X and O, take turns "
+          "marking the spaces in a 3*3 grid. The player who succeeds in placing "
+          "three of their marks in a horizontal, vertical, or diagonal row wins.")
+    print("\n")
+    input("Press enter to continue.")
+    print("\n")
+
+
+
+def create_grid():
+# This function creates a blank playboard
+    print("Here is the playboard: ")
+    board = [[" ", " ", " "],
+             [" ", " ", " "],
+             [" ", " ", " "]]        
+    return board
+
+
+
+def sym():
+# This function decides the players' symbols
+    symbol_1 = input("Player 1, do you want to be X or O? ")
+    if symbol_1 == "X":
+        symbol_2 = "O"
+        print("Player 2, you are O. ")
     else:
-        message = winner.upper() + " won!"
-    if draw:
-        message = 'Game Draw!'
-
-    font = pg.font.Font(None, 30)
-    text = font.render(message, 1, (255, 255, 255))
-
-    # copy the rendered message onto the board
-    screen.fill ((0, 0, 0), (0, 400, 500, 100))
-    text_rect = text.get_rect(center=(width/2, 500-50))
-    screen.blit(text, text_rect)
-    pg.display.update()
-
-def check_win():
-    global TTT, winner,draw
-
-    # check for winning rows
-    for row in range (0,3):
-        if ((TTT [row][0] == TTT[row][1] == TTT[row][2]) and(TTT [row][0] is not None)):
-            # this row won
-            winner = TTT[row][0]
-            pg.draw.line(screen, (250,0,0), (0, (row + 1)*height/3 -height/6),\
-                              (width, (row + 1)*height/3 - height/6 ), 4)
-            break
-
-    # check for winning columns
-    for col in range (0, 3):
-        if (TTT[0][col] == TTT[1][col] == TTT[2][col]) and (TTT[0][col] is not None):
-            # this column won
-            winner = TTT[0][col]
-            #draw winning line
-            pg.draw.line (screen, (250,0,0),((col + 1)* width/3 - width/6, 0),\
-                          ((col + 1)* width/3 - width/6, height), 4)
-            break
-
-    # check for diagonal winners
-    if (TTT[0][0] == TTT[1][1] == TTT[2][2]) and (TTT[0][0] is not None):
-        # game won diagonally left to right
-        winner = TTT[0][0]
-        pg.draw.line (screen, (250,70,70), (50, 50), (350, 350), 4)
-       
-
-    if (TTT[0][2] == TTT[1][1] == TTT[2][0]) and (TTT[0][2] is not None):
-        # game won diagonally right to left
-        winner = TTT[0][2]
-        pg.draw.line (screen, (250,70,70), (350, 50), (50, 350), 4)
-    
-    if(all([all(row) for row in TTT]) and winner is None ):
-        draw = True
-    draw_status()
+        symbol_2 = "X"
+        print("Player 2, you are X. ")
+    input("Press enter to continue.")
+    print("\n")
+    return (symbol_1, symbol_2)
 
 
-def drawXO(row,col):
-    global TTT,XO
-    if row==1:
-        posx = 30
-    if row==2:
-        posx = width/3 + 30
-    if row==3:
-        posx = width/3*2 + 30
 
-    if col==1:
-        posy = 30
-    if col==2:
-        posy = height/3 + 30
-    if col==3:
-        posy = height/3*2 + 30
-    TTT[row-1][col-1] = XO
-    if(XO == 'x'):
-        screen.blit(x_img,(posy,posx))
-        XO= 'o'
-    else:
-        screen.blit(o_img,(posy,posx))
-        XO= 'x'
-    pg.display.update()
-    #print(posx,posy)
-    #print(TTT)
-   
-    
+def startGamming(board, symbol_1, symbol_2, count):
+# This function starts the game.
 
-def userClick():
-    #get coordinates of mouse click
-    x,y = pg.mouse.get_pos()
+    # Decides the turn
+    if count % 2 == 0:
+        player = symbol_1
+    elif count % 2 == 1:
+        player = symbol_2
+    print("Player "+ player + ", it is your turn. ")
+    row = int(input("Pick a row:"
+                    "[upper row: enter 0, middle row: enter 1, bottom row: enter 2]:"))
+    column = int(input("Pick a column:"
+                       "[left column: enter 0, middle column: enter 1, right column enter 2]"))
 
-    #get column of mouse click (1-3)
-    if(x<width/3):
-        col = 1
-    elif (x<width/3*2):
-        col = 2
-    elif(x<width):
-        col = 3
-    else:
-        col = None
+
+    # Check if players' selection is out of range
+    while (row > 2 or row < 0) or (column > 2 or column < 0):
+        outOfBoard(row, column)
+        row = int(input("Pick a row[upper row:"
+                        "[enter 0, middle row: enter 1, bottom row: enter 2]:"))
+        column = int(input("Pick a column:"
+                           "[left column: enter 0, middle column: enter 1, right column enter 2]"))
+
+        # Check if the square is already filled
+    while (board[row][column] == symbol_1)or (board[row][column] == symbol_2):
+        filled = illegal(board, symbol_1, symbol_2, row, column)
+        row = int(input("Pick a row[upper row:"
+                        "[enter 0, middle row: enter 1, bottom row: enter 2]:"))
+        column = int(input("Pick a column:"
+                            "[left column: enter 0, middle column: enter 1, right column enter 2]"))    
         
-    #get row of mouse click (1-3)
-    if(y<height/3):
-        row = 1
-    elif (y<height/3*2):
-        row = 2
-    elif(y<height):
-        row = 3
-    else:
-        row = None
-    #print(row,col)
-    
-
-    if(row and col and TTT[row-1][col-1] is None):
-        global XO
-        
-        #draw the x or o on screen
-        drawXO(row,col)
-        check_win()
-        
-        
-
-def reset_game():
-    global TTT, winner,XO, draw
-    time.sleep(3)
-    XO = 'x'
-    draw = False
-    game_opening()
-    winner=None
-    TTT = [[None]*3,[None]*3,[None]*3]
-    
-
-game_opening()
-
-# run the game loop forever
-while(True):
-    for event in pg.event.get():
-        if event.type == QUIT:
-            pg.quit()
-            sys.exit()
-        elif event.type == MOUSEBUTTONDOWN:
-            # the user clicked; place an X or O
-            userClick()
-            if(winner or draw):
-                reset_game()
+    # Locates player's symbol on the board
+    if player == symbol_1:
+        board[row][column] = symbol_1
             
-    pg.display.update()
-    CLOCK.tick(fps)
+    else:
+        board[row][column] = symbol_2
+    
+    return (board)
+
+
+
+def isFull(board, symbol_1, symbol_2):
+    count = 1
+    winner = True
+# This function check if the board is full
+    while count < 10 and winner == True:
+        gaming = startGamming(board, symbol_1, symbol_2, count)
+        pretty = printPretty(board)
+        
+        if count == 9:
+            print("The board is full. Game over.")
+            if winner == True:
+                print("There is a tie. ")
+
+        # Check if here is a winner
+        winner = isWinner(board, symbol_1, symbol_2, count)
+        count += 1
+    if winner == False:
+        print("Game over.")
+        
+    # This is function gives a report 
+    report(count, winner, symbol_1, symbol_2)
+
+
+
+def outOfBoard(row, column):
+# This function tells the players that their selection is out of range
+    print("Out of boarder. Pick another one. ")
+    
+    
+
+def printPretty(board):
+# This function prints the board nice!
+    rows = len(board)
+    cols = len(board)
+    print("---+---+---")
+    for r in range(rows):
+        print(board[r][0], " |", board[r][1], "|", board[r][2])
+        print("---+---+---")
+    return board
+
+
+
+def isWinner(board, symbol_1, symbol_2, count):
+# This function checks if any winner is winning
+    winner = True
+    # Check the rows
+    for row in range (0, 3):
+        if (board[row][0] == board[row][1] == board[row][2] == symbol_1):
+            winner = False
+            print("Player " + symbol_1 + ", you won!")
+   
+        elif (board[row][0] == board[row][1] == board[row][2] == symbol_2):
+            winner = False
+            print("Player " + symbol_2 + ", you won!")
+            
+            
+    # Check the columns
+    for col in range (0, 3):
+        if (board[0][col] == board[1][col] == board[2][col] == symbol_1):
+            winner = False
+            print("Player " + symbol_1 + ", you won!")
+        elif (board[0][col] == board[1][col] == board[2][col] == symbol_2):
+            winner = False
+            print("Player " + symbol_2 + ", you won!")
+
+    # Check the diagnoals
+    if board[0][0] == board[1][1] == board[2][2] == symbol_1:
+        winner = False 
+        print("Player " + symbol_1 + ", you won!")
+
+    elif board[0][0] == board[1][1] == board[2][2] == symbol_2:
+        winner = False
+        print("Player " + symbol_2 + ", you won!")
+
+    elif board[0][2] == board[1][1] == board[2][0] == symbol_1:
+        winner = False
+        print("Player " + symbol_1 + ", you won!")
+
+    elif board[0][2] == board[1][1] == board[2][0] == symbol_2:
+        winner = False
+        print("Player " + symbol_2 + ", you won!")
+
+    return winner
+    
+
+
+def illegal(board, symbol_1, symbol_2, row, column):
+    print("The square you picked is already filled. Pick another one.")
+
+    
+def report(count, winner, symbol_1, symbol_2):
+    print("\n")
+    input("Press enter to see the game summary. ")
+    if (winner == False) and (count % 2 == 1 ):
+        print("Winner : Player " + symbol_1 + ".")
+    elif (winner == False) and (count % 2 == 0 ):
+        print("Winner : Player " + symbol_2 + ".")
+    else:
+        print("There is a tie. ")
+
+# Call Main
+main()
